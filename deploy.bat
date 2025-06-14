@@ -76,6 +76,24 @@ IF EXIST "%README%" copy "%README%" "%README%.bak" >nul
 move /Y "%TEMP_README%" "%README%"
 
 REM ─────────────────────────────────────────────────────
+REM GIT COMMIT AND PUSH CHANGES
+REM ─────────────────────────────────────────────────────
+pushd "%PLUGIN_DIR%"
+git add -A
+
+git diff --cached --quiet
+IF %ERRORLEVEL% EQU 1 (
+    git commit -m "Version %version% Release"
+    git push origin main
+    echo ✅ Git commit and push complete.
+) ELSE (
+    echo ⚠️ No changes to commit.
+)
+popd
+
+
+
+REM ─────────────────────────────────────────────────────
 REM ZIP PLUGIN FOLDER
 REM ─────────────────────────────────────────────────────
 SET "SEVENZIP=C:\Program Files\7-Zip\7z.exe"

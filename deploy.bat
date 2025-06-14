@@ -15,7 +15,7 @@ SET "STATIC_FILE=static.txt"
 SET "README=%PLUGIN_DIR%\readme.txt"
 SET "TEMP_README=%PLUGIN_DIR%\readme_temp.txt"
 SET "DEST_DIR=D:\updater.reallyusefulplugins.com\plugin-updates\custom-packages\"
-SET "DEPLOY_TARGET=github"  REM github or private
+SET "DEPLOY_TARGET=private"  REM github or private
 
 REM GitHub settings
 SET "GITHUB_REPO=stingray82/example-plugin"

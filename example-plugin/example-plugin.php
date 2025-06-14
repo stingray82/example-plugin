@@ -5,8 +5,8 @@
  * Tested up to:      6.8.1
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.0
- * Author:            Your Name
+ * Version:           1.0.1
+ * Author:            Nathan Foley
  * Author URI:        https://reallyusefulplugins.com
  * License:           GPL2
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define our plugin version
 if ( ! defined( 'EXAMPLE_PLUGIN_VERSION' ) ) {
-    define('EXAMPLE_PLUGIN_VERSION', '1.0');
+    define('EXAMPLE_PLUGIN_VERSION', '1.0.1');
 }
 
 // ──────────────────────────────────────────────────────────────────────────

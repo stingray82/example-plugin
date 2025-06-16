@@ -145,21 +145,22 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
 
     echo Generating static index.json...
 
+    SETLOCAL
+
     SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
+    SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
 
-    REM Default to STATIC_REPO_DIR unless empty
-    IF NOT "%STATIC_REPO_DIR%"=="" (
-        SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
-    )
-
-    REM Remove trailing backslash
+    REM Remove trailing backslash if it exists
     IF NOT "%PLUGIN_STATIC_PATH%"=="" (
         IF "%PLUGIN_STATIC_PATH:~-1%"=="\" (
             SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
         )
     )
 
-    REM Final check before continuing
+    REM Copy value back into global scope
+    ENDLOCAL & SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH%"
+
+    REM Final check
     IF "%PLUGIN_STATIC_PATH%"=="" (
         echo ❌ PLUGIN_STATIC_PATH is empty — aborting static JSON generation.
         goto :skip_static
@@ -196,6 +197,7 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
 )
 
 :skip_static
+
 
 
 

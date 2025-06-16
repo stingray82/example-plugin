@@ -265,7 +265,12 @@ for /f "tokens=*" %%L in ('type "%TEMP%\github_release_response.json"') do (
         if !errorlevel! neq 1 (
             for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
                 set "ASSET_ID=%%B"
-                set "ASSET_ID=!ASSET_ID:,=!"
+                set "ASSET_ID=!ASSET_ID:,=!"    
+                 )
+            )
+        )
+    )
+)
 
 if defined ASSET_ID (
     echo 🗑️ Deleting existing asset ID: !ASSET_ID!...
@@ -276,20 +281,17 @@ if defined ASSET_ID (
     echo ⚠️ No matching asset found to delete.
 )
 
-
-
-
-    REM 📤 Upload ZIP file to release
-    echo 📤 Uploading new ZIP...
-    curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
-        -H "Authorization: token %GITHUB_TOKEN%" ^
-        -H "Accept: application/vnd.github+json" ^
-        -H "Content-Type: application/zip" ^
-        --data-binary "@%ZIP_FILE%"
+REM 📤 Upload ZIP file to release
+echo 📤 Uploading new ZIP...
+curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
+    -H "Authorization: token %GITHUB_TOKEN%" ^
+    -H "Accept: application/vnd.github+json" ^
+    -H "Content-Type: application/zip" ^
+    --data-binary "@%ZIP_FILE%"
 
 echo.
 echo ✅ Deployment complete → %DEPLOY_TARGET%
 endlocal
 pause
-)
+
 

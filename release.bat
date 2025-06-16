@@ -149,14 +149,26 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
     SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
 
     REM Strip trailing backslash ONLY if it exists
-    IF "%PLUGIN_STATIC_PATH:~-1%"=="\" (
-        SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
+    IF NOT "%PLUGIN_STATIC_PATH%"=="" (
+        IF "%PLUGIN_STATIC_PATH:~-1%"=="\" (
+            SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
+        )
     )
 
+    REM Final check: bail if still empty
+    IF "%PLUGIN_STATIC_PATH%"=="" (
+        echo ❌ PLUGIN_STATIC_PATH is empty — aborting static JSON generation.
+        goto :skip_static
+    )
+
+    echo ✅ Using PLUGIN_STATIC_PATH: [%PLUGIN_STATIC_PATH%]
+
+    REM Ensure output path exists
     IF NOT EXIST "%PLUGIN_STATIC_PATH%" (
         mkdir "%PLUGIN_STATIC_PATH%"
     )
 
+    REM Call PHP generator
     php "%GENERATE_INDEX_SCRIPT%" ^
         "%PLUGIN_FILE%" ^
         "%CHANGELOG_FILE%" ^
@@ -168,6 +180,7 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
 
     echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
 
+    REM Git commit and push
     pushd "%STATIC_REPO_DIR%"
     git add -A
     git diff --cached --quiet
@@ -180,6 +193,9 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
     )
     popd
 )
+
+:skip_static
+
 
 
 REM ─────────────────────────────────────────────────────

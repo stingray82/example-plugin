@@ -1,10 +1,10 @@
 === Example Plugin ===
 Contributors: reallyusefulplugins
 Donate link: https://reallyusefulplugins.com/donate
-Tags: Example 
+Tags: Example
 Requires at least: 6.5
 Tested up to: 6.8.1
-Stable tag: 1.0.5.8
+Stable tag: 1.0.5.9
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

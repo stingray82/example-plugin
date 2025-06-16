@@ -245,6 +245,7 @@ IF /I "%DEPLOY_TARGET%"=="private" (
     IF NOT DEFINED RELEASE_ID (
         echo ❌ Could not determine release ID.
         type "%TEMP%\github_release_response.json"
+        pause
         exit /b
     )
 

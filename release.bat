@@ -1,10 +1,5 @@
 @echo off
 setlocal enabledelayedexpansion
-:: Check if we were launched from a double-click (no parent console window)
-:: %1 is empty when double-clicked
-set "INTERACTIVE=0"
-if "%~1"=="" set "INTERACTIVE=1"
-
 
 REM ─────────────────────────────────────────────────────
 REM CONFIGURATION

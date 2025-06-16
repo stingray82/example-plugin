@@ -171,7 +171,7 @@ IF /I "%DEPLOY_TARGET%"=="private" (
     echo 🔄 Deploying to private server...
     copy "%ZIP_FILE%" "%DEST_DIR%"
     echo ✅ Copied to %DEST_DIR%
-) ) ELSE IF /I "%DEPLOY_TARGET%"=="github" (
+) ELSE IF /I "%DEPLOY_TARGET%"=="github" (
     CALL :deploy_github
 )
 
@@ -292,3 +292,17 @@ if defined ASSET_ID (
         -H "Authorization: token %GITHUB_TOKEN%" ^
         -H "Accept: application/vnd.github+json"
 ) else (
+    echo ⚠️ No matching asset found to delete.
+)
+
+REM 📤 Upload ZIP file to release
+echo 📤 Uploading new ZIP...
+curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
+    -H "Authorization: token %GITHUB_TOKEN%" ^
+    -H "Accept: application/vnd.github+json" ^
+    -H "Content-Type: application/zip" ^
+    --data-binary "@%ZIP_FILE%"
+
+echo ✅ Deployment complete → github
+endlocal
+exit /b

@@ -171,85 +171,92 @@ IF /I "%DEPLOY_TARGET%"=="private" (
     echo 🔄 Deploying to private server...
     copy "%ZIP_FILE%" "%DEST_DIR%"
     echo ✅ Copied to %DEST_DIR%
-) ELSE IF /I "%DEPLOY_TARGET%"=="github" (
-    echo 🚀 Deploying to GitHub...
+) ) ELSE IF /I "%DEPLOY_TARGET%"=="github" (
+    CALL :deploy_github
+)
 
-    setlocal enabledelayedexpansion
-    set "RELEASE_TAG=v%version%"
-    set "RELEASE_NAME=%version%"
-    set "BODY_FILE=%TEMP%\changelog_body.json"
-    set "CHANGELOG_BODY="
+pause
+exit /b
 
-    echo Creating body file...
+:deploy_github
+echo 🚀 Deploying to GitHub...
 
-    for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
-        set "line=%%l"
-        set "line=!line:"=\\\"!"
-        set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\n"
+setlocal enabledelayedexpansion
+set "RELEASE_TAG=v%version%"
+set "RELEASE_NAME=%version%"
+set "BODY_FILE=%TEMP%\changelog_body.json"
+set "CHANGELOG_BODY="
+
+echo Creating body file...
+
+for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
+    set "line=%%l"
+    set "line=!line:"=\\\"!"
+    set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\n"
+)
+set "CHANGELOG_BODY=!CHANGELOG_BODY:~0,-2!"
+
+(
+    echo {
+    echo   "tag_name": "!RELEASE_TAG!",
+    echo   "name": "!RELEASE_NAME!",
+    echo   "body": "!CHANGELOG_BODY!",
+    echo   "draft": false,
+    echo   "prerelease": false
+    echo }
+) > "!BODY_FILE!"
+
+echo -------- BEGIN JSON BODY --------
+type "!BODY_FILE!"
+echo -------- END JSON BODY ----------
+
+REM Try to get existing release by tag
+curl -s -w "%%{http_code}" -o "%TEMP%\github_release_response.json" ^
+    -H "Authorization: token %GITHUB_TOKEN%" ^
+    -H "Accept: application/vnd.github+json" ^
+    https://api.github.com/repos/%GITHUB_REPO%/releases/tags/!RELEASE_TAG! > "%TEMP%\github_http_status.txt"
+
+set /p HTTP_STATUS=<"%TEMP%\github_http_status.txt"
+
+set "RELEASE_ID="
+
+if "!HTTP_STATUS!"=="200" (
+    for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
+        if not defined RELEASE_ID set "RELEASE_ID=%%i"
     )
-    set "CHANGELOG_BODY=!CHANGELOG_BODY:~0,-2!"
+    set "RELEASE_ID=!RELEASE_ID: =!"
+    set "RELEASE_ID=!RELEASE_ID:,=!"
+    echo 📝 Release already exists. Updating body...
 
-    (
-        echo {
-        echo   "tag_name": "!RELEASE_TAG!",
-        echo   "name": "!RELEASE_NAME!",
-        echo   "body": "!CHANGELOG_BODY!",
-        echo   "draft": false,
-        echo   "prerelease": false
-        echo }
-    ) > "!BODY_FILE!"
-
-    echo -------- BEGIN JSON BODY --------
-    type "!BODY_FILE!"
-    echo -------- END JSON BODY ----------
-
-    REM Try to get existing release by tag
-    curl -s -w "%%{http_code}" -o "%TEMP%\github_release_response.json" ^
+    curl -s -X PATCH "https://api.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!" ^
         -H "Authorization: token %GITHUB_TOKEN%" ^
         -H "Accept: application/vnd.github+json" ^
-        https://api.github.com/repos/%GITHUB_REPO%/releases/tags/!RELEASE_TAG! > "%TEMP%\github_http_status.txt"
+        -H "Content-Type: application/json" ^
+        --data-binary "@!BODY_FILE!"
+) else (
+    echo 🆕 Creating new release...
 
-    set /p HTTP_STATUS=<"%TEMP%\github_http_status.txt"
+    curl -s -X POST "https://api.github.com/repos/%GITHUB_REPO%/releases" ^
+        -H "Authorization: token %GITHUB_TOKEN%" ^
+        -H "Accept: application/vnd.github+json" ^
+        -H "Content-Type: application/json" ^
+        --data-binary "@!BODY_FILE!" > "%TEMP%\github_release_response.json"
 
-    set "RELEASE_ID="
-
-    if "!HTTP_STATUS!"=="200" (
-        for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
-            if not defined RELEASE_ID set "RELEASE_ID=%%i"
-        )
-        set "RELEASE_ID=!RELEASE_ID: =!"
-        set "RELEASE_ID=!RELEASE_ID:,=!"
-        echo 📝 Release already exists. Updating body...
-
-        curl -s -X PATCH "https://api.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!" ^
-            -H "Authorization: token %GITHUB_TOKEN%" ^
-            -H "Accept: application/vnd.github+json" ^
-            -H "Content-Type: application/json" ^
-            --data-binary "@!BODY_FILE!"
-    ) else (
-        echo 🆕 Creating new release...
-
-        curl -s -X POST "https://api.github.com/repos/%GITHUB_REPO%/releases" ^
-            -H "Authorization: token %GITHUB_TOKEN%" ^
-            -H "Accept: application/vnd.github+json" ^
-            -H "Content-Type: application/json" ^
-            --data-binary "@!BODY_FILE!" > "%TEMP%\github_release_response.json"
-
-        for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
-            if not defined RELEASE_ID set "RELEASE_ID=%%i"
-        )
-        set "RELEASE_ID=!RELEASE_ID: =!"
-        set "RELEASE_ID=!RELEASE_ID:,=!"
+    for /f "tokens=2 delims=:," %%i in ('findstr /C:"\"id\"" "%TEMP%\github_release_response.json"') do (
+        if not defined RELEASE_ID set "RELEASE_ID=%%i"
     )
+    set "RELEASE_ID=!RELEASE_ID: =!"
+    set "RELEASE_ID=!RELEASE_ID:,=!"
+)
 
-    IF NOT DEFINED RELEASE_ID (
-        echo ❌ Could not determine release ID.
-        type "%TEMP%\github_release_response.json"
-        pause
-        exit /b
-    )
+IF NOT DEFINED RELEASE_ID (
+    echo ❌ Could not determine release ID.
+    type "%TEMP%\github_release_response.json"
+    endlocal
+    exit /b
+)
 
-    REM 🗑️ Attempt to find existing ZIP asset and delete it properly
+REM 🗑️ Attempt to find existing ZIP asset and delete it properly
 set "ASSET_ID="
 set "FOUND_ZIP=0"
 
@@ -285,21 +292,3 @@ if defined ASSET_ID (
         -H "Authorization: token %GITHUB_TOKEN%" ^
         -H "Accept: application/vnd.github+json"
 ) else (
-    echo ⚠️ No matching asset found to delete.
-)
-
-
-REM 📤 Upload ZIP file to release
-echo 📤 Uploading new ZIP...
-curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
-    -H "Authorization: token %GITHUB_TOKEN%" ^
-    -H "Accept: application/vnd.github+json" ^
-    -H "Content-Type: application/zip" ^
-    --data-binary "@%ZIP_FILE%"
-
-echo.
-echo ✅ Deployment complete → %DEPLOY_TARGET%
-echo Press any key to exit...
-pause >nul
-endlocal
-exit /b

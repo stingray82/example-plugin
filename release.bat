@@ -278,16 +278,17 @@ if defined ASSET_ID (
 
 
 
-REM 📤 Upload ZIP file to release
-echo 📤 Uploading new ZIP...
-curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
-    -H "Authorization: token %GITHUB_TOKEN%" ^
-    -H "Accept: application/vnd.github+json" ^
-    -H "Content-Type: application/zip" ^
-    --data-binary "@%ZIP_FILE%"
+    REM 📤 Upload ZIP file to release
+    echo 📤 Uploading new ZIP...
+    curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
+        -H "Authorization: token %GITHUB_TOKEN%" ^
+        -H "Accept: application/vnd.github+json" ^
+        -H "Content-Type: application/zip" ^
+        --data-binary "@%ZIP_FILE%"
+    
+    echo.
+    echo ✅ Deployment complete → %DEPLOY_TARGET%
+    endlocal
 )
 
-echo.
-echo ✅ Deployment complete → %DEPLOY_TARGET%
 pause
-)

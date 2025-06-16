@@ -174,11 +174,13 @@ echo Creating body file...
 
 for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
     set "line=%%l"
+    REM Escape backslashes and quotes, then wrap each line in quotes and append \n manually.
     set "line=!line:\=\\!"
-    set "line=!line:"=\\"!"
-    set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\n"
+    set "line=!line:"=\"!"
+    set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\\n"
+
 )
-set "CHANGELOG_BODY=!CHANGELOG_BODY:~0,-2!"
+REM No need to trim, it's a plain string now.
 
 > "!BODY_FILE!" (
     echo {

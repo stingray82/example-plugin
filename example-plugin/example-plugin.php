@@ -38,10 +38,10 @@ add_action( 'plugins_loaded', function() {
         'name'        => 'example-plugin',         // human‐readable plugin name
         'version'     => EXAMPLE_PLUGIN_VERSION, // same as the VERSION constant above
         'key'         => 'testkey123',                 // your secret key for private updater
-        //'server'      => 'https://github.com/stingray82/example-plugin',
-        'server'      => 'https://updater.reallyusefulplugins.com/u/',
+        'server'      => 'https://github.com/stingray82/example-plugin',
+        //'server'      => 'https://updater.reallyusefulplugins.com/u/',
         // 'textdomain' is omitted, so the helper will automatically use 'slug'
-        //'textdomain'  => 'simply-static-export-notify',           // used to translate “Check for updates”
+        
     ];
 
     // 3) Call the helper in the UUPD\V1 namespace:

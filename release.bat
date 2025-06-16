@@ -1,5 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
+:: Check if we were launched from a double-click (no parent console window)
+:: %1 is empty when double-clicked
+set "INTERACTIVE=0"
+if "%~1"=="" set "INTERACTIVE=1"
+
 
 REM ─────────────────────────────────────────────────────
 REM CONFIGURATION
@@ -161,10 +166,13 @@ IF /I "%DEPLOY_TARGET%"=="private" (
 goto :done
 
 :done
-echo.
-echo 🔚 Done. Press any key to exit...
-pause >nul
+if "%INTERACTIVE%"=="1" (
+    echo.
+    echo 🔚 Done. Press any key to exit...
+    pause >nul
+)
 exit
+
 
 
 :deploy_github
@@ -297,4 +305,4 @@ curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEAS
 
 echo ✅ Deployment complete → github
 endlocal
-goto :eof
+goto :done

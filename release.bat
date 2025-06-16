@@ -304,56 +304,23 @@ IF NOT DEFINED RELEASE_ID (
     exit /b
 )
 
-setlocal enabledelayedexpansion
-set "ASSET_ID="
-set "MATCHING_ASSET=0"
+echo 📤 Uploading ZIP to GitHub...
 
-for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
-    set "LINE=%%L"
-    setlocal enabledelayedexpansion
-
-    REM --- Look for the matching ZIP file name
-    echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
-    if !errorlevel! == 0 (
-        set "MATCHING_ASSET=1"
-    )
-
-    REM --- When found, start looking backward for the `id` key
-    if !MATCHING_ASSET! == 1 (
-        echo !LINE! | findstr /C:"\"id\":" >nul
-        if !errorlevel! == 0 (
-            for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
-                endlocal
-                set "ASSET_ID=%%B"
-                set "ASSET_ID=%ASSET_ID:,=%"
-                set "ASSET_ID=%ASSET_ID: =%"
-                goto :found_asset
-            )
-        )
-    )
-
-    endlocal
-)
-:found_asset
-endlocal & set "ASSET_ID=%ASSET_ID%"
-
-
-if defined ASSET_ID (
-    echo Deleting existing asset ID: %ASSET_ID%...
-    curl -X DELETE -H "Authorization: token %GITHUB_TOKEN%" ^
-         https://api.github.com/repos/%GITHUB_REPO%/releases/assets/%ASSET_ID%
-) else (
-    echo ⚠️ No matching asset found to delete.
-)
-
-echo 📤 Uploading new ZIP...
 curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
     -H "Authorization: token %GITHUB_TOKEN%" ^
     -H "Accept: application/vnd.github+json" ^
     -H "Content-Type: application/zip" ^
-    --data-binary "@%ZIP_FILE%"
+    --data-binary "@%ZIP_FILE%" > "%TEMP%\github_asset_response.json"
 
-echo ✅ Deployment complete → github
+REM Check if upload failed due to already existing asset
+findstr /C:"already_exists" "%TEMP%\github_asset_response.json" >nul
+IF %ERRORLEVEL% EQU 0 (
+    echo ⚠️ Asset already exists. Skipping upload.
+) ELSE (
+    echo ✅ ZIP uploaded to GitHub successfully.
+)
+
 endlocal
 goto :done
+
 

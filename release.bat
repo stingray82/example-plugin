@@ -249,13 +249,13 @@ for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
     set "LINE=%%L"
     setlocal enabledelayedexpansion
 
-    REM Step 1: Look for the asset matching the ZIP file
+    REM --- Look for the matching ZIP file name
     echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
     if !errorlevel! == 0 (
         set "MATCHING_ASSET=1"
     )
 
-    REM Step 2: Once matching asset found, look for the ID
+    REM --- When found, start looking backward for the `id` key
     if !MATCHING_ASSET! == 1 (
         echo !LINE! | findstr /C:"\"id\":" >nul
         if !errorlevel! == 0 (
@@ -276,13 +276,11 @@ endlocal & set "ASSET_ID=%ASSET_ID%"
 
 
 if defined ASSET_ID (
-    echo 🗑️ Deleting existing asset ID: !ASSET_ID!...
-    curl -s -X DELETE "https://api.github.com/repos/%GITHUB_REPO%/releases/assets/!ASSET_ID!" ^
-        -H "Authorization: token %GITHUB_TOKEN%" ^
-        -H "Accept: application/vnd.github+json"
+    echo Deleting existing asset ID: %ASSET_ID%...
+    curl -X DELETE -H "Authorization: token %GITHUB_TOKEN%" ^
+         https://api.github.com/repos/%GITHUB_REPO%/releases/assets/%ASSET_ID%
 ) else (
     echo ⚠️ No matching asset found to delete.
-)
 
 echo 📤 Uploading new ZIP...
 curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^

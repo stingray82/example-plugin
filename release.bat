@@ -148,18 +148,20 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
     SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
     SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
 
-    REM Strip trailing backslash ONLY if it exists
-    IF NOT "%PLUGIN_STATIC_PATH%"=="" (
-        IF "%PLUGIN_STATIC_PATH:~-1%"=="\" (
-            SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
-        )
+REM Safely remove trailing backslash if present
+IF DEFINED PLUGIN_STATIC_PATH (
+    SET "lastChar=%PLUGIN_STATIC_PATH:~-1%"
+    IF "%lastChar%"=="\" (
+        SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
     )
+)
 
-    REM Final check: bail if still empty
-    IF "%PLUGIN_STATIC_PATH%"=="" (
-        echo ❌ PLUGIN_STATIC_PATH is empty — aborting static JSON generation.
-        goto :skip_static
-    )
+REM Final sanity check
+IF NOT DEFINED PLUGIN_STATIC_PATH (
+    echo ❌ PLUGIN_STATIC_PATH is empty — aborting static JSON generation.
+    goto :skip_static
+)
+
 
     echo ✅ Using PLUGIN_STATIC_PATH: [%PLUGIN_STATIC_PATH%]
 

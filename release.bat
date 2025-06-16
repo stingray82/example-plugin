@@ -146,16 +146,24 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
 
     SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
     SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
-    SET "TRIMMED_STATIC_PATH=%PLUGIN_STATIC_PATH%"
-    IF "%TRIMMED_STATIC_PATH:~-1%"=="\" (
-        SET "TRIMMED_STATIC_PATH=%TRIMMED_STATIC_PATH:~0,-1%"
-    )
-    SET "PLUGIN_STATIC_PATH=%TRIMMED_STATIC_PATH%"
 
+    REM Strip trailing backslash if present
+    IF "%PLUGIN_STATIC_PATH:~-1%"=="\" SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
+
+    REM Abort early if result is empty
+    IF "%PLUGIN_STATIC_PATH%"=="" (
+        echo ❌ PLUGIN_STATIC_PATH resolved to an empty string.
+        pause & exit /b
+    )
+
+    echo Using PLUGIN_STATIC_PATH: [%PLUGIN_STATIC_PATH%]
+
+    REM Ensure output path exists
     IF NOT EXIST "%PLUGIN_STATIC_PATH%" (
         mkdir "%PLUGIN_STATIC_PATH%"
     )
 
+    REM Call PHP generator
     php "%GENERATE_INDEX_SCRIPT%" ^
         "%PLUGIN_FILE%" ^
         "%CHANGELOG_FILE%" ^
@@ -167,6 +175,7 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
 
     echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
 
+    REM Git commit and push
     pushd "%STATIC_REPO_DIR%"
     git add -A
     git diff --cached --quiet

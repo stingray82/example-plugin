@@ -245,25 +245,31 @@ setlocal enabledelayedexpansion
 set "ASSET_ID="
 set "ZIP_FOUND=0"
 
+REM Parse release JSON to find matching asset name and grab its ID
 for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
     set "LINE=%%L"
+    setlocal enabledelayedexpansion
     echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
     if !errorlevel! neq 1 (
         set "ZIP_FOUND=1"
     )
-    if !ZIP_FOUND!==1 (
-        echo !LINE! | findstr /C:"\"id\":" >nul
-        if !errorlevel! neq 1 (
-            for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
-                set "ASSET_ID=%%B"
-                set "ASSET_ID=!ASSET_ID:,=!"
-                set "ASSET_ID=!ASSET_ID: =!"
-            )
+    if !ZIP_FOUND!==0 (
+        endlocal
+        goto :continue_loop
+    )
+    echo !LINE! | findstr /C:"\"id\":" >nul
+    if !errorlevel! neq 1 (
+        for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
+            set "ASSET_ID=%%B"
+            set "ASSET_ID=!ASSET_ID:,=!"
+            set "ASSET_ID=!ASSET_ID: =!"
         )
     )
+    endlocal
+    :continue_loop
 )
-
 endlocal & set "ASSET_ID=%ASSET_ID%"
+
 
 
 

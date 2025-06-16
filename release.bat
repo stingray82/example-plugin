@@ -286,10 +286,10 @@ if defined ASSET_ID (
         -H "Accept: application/vnd.github+json" ^
         -H "Content-Type: application/zip" ^
         --data-binary "@%ZIP_FILE%"
-    
-    echo.
-    echo ✅ Deployment complete → %DEPLOY_TARGET%
-    endlocal
+
+echo.
+echo ✅ Deployment complete → %DEPLOY_TARGET%
+endlocal
+pause
 )
 
-pause

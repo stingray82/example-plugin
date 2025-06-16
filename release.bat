@@ -243,7 +243,7 @@ IF NOT DEFINED RELEASE_ID (
 
 setlocal enabledelayedexpansion
 set "ASSET_ID="
-set "IN_ASSET_BLOCK=0"
+set "MATCHING_ASSET=0"
 
 for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
     set "LINE=%%L"
@@ -252,11 +252,11 @@ for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
     REM Step 1: Look for the asset matching the ZIP file
     echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
     if !errorlevel! == 0 (
-        set "IN_ASSET_BLOCK=1"
+        set "MATCHING_ASSET=1"
     )
 
-    REM Step 2: Once we’ve flagged it, look for the next "id": line
-    if !IN_ASSET_BLOCK! == 1 (
+    REM Step 2: Once matching asset found, look for the ID
+    if !MATCHING_ASSET! == 1 (
         echo !LINE! | findstr /C:"\"id\":" >nul
         if !errorlevel! == 0 (
             for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
@@ -264,17 +264,15 @@ for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
                 set "ASSET_ID=%%B"
                 set "ASSET_ID=%ASSET_ID:,=%"
                 set "ASSET_ID=%ASSET_ID: =%"
-                goto :found_asset_id
+                goto :found_asset
             )
         )
     )
+
     endlocal
 )
-:found_asset_id
+:found_asset
 endlocal & set "ASSET_ID=%ASSET_ID%"
-
-
-
 
 
 if defined ASSET_ID (

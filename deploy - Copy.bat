@@ -250,23 +250,21 @@ IF /I "%DEPLOY_TARGET%"=="private" (
 
     REM 🗑️ Attempt to find existing ZIP asset and delete it properly
 set "ASSET_ID="
-for /f "tokens=*" %%A in ('type "%TEMP%\github_release_response.json"') do (
-    echo %%A | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
-    if !errorlevel! == 0 (
-        set "found_asset=1"
+set "FOUND_ZIP=0"
+
+for /f "tokens=*" %%L in ('type "%TEMP%\github_release_response.json"') do (
+    set "LINE=%%L"
+    echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
+    if !errorlevel! neq 1 (
+        set "FOUND_ZIP=1"
     )
-    if defined found_asset (
-        echo %%A | findstr /R /C:"\"id\":" >nul
-        if !errorlevel! == 0 (
-            for /f "tokens=2 delims=:" %%B in ("%%A") do (
+
+    if !FOUND_ZIP! == 1 (
+        echo !LINE! | findstr /C:"\"id\":" >nul
+        if !errorlevel! neq 1 (
+            for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
                 set "ASSET_ID=%%B"
-                set "ASSET_ID=!ASSET_ID: =!"
                 set "ASSET_ID=!ASSET_ID:,=!"
-                set "found_asset="
-            )
-        )
-    )
-)
 
 if defined ASSET_ID (
     echo 🗑️ Deleting existing asset ID: !ASSET_ID!...

@@ -241,33 +241,31 @@ IF NOT DEFINED RELEASE_ID (
     exit /b
 )
 
+setlocal enabledelayedexpansion
 set "ASSET_ID="
-set "FOUND_ZIP=0"
+set "ZIP_FOUND=0"
 
-for /f "tokens=*" %%L in ('type "%TEMP%\github_release_response.json"') do (
+for /f "usebackq tokens=*" %%L in ("%TEMP%\github_release_response.json") do (
     set "LINE=%%L"
     echo !LINE! | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
     if !errorlevel! neq 1 (
-        set "FOUND_ZIP=1"
+        set "ZIP_FOUND=1"
     )
-
-    if !FOUND_ZIP! == 1 (
-        goto :continue
-    )
-
-    echo !LINE! | findstr /C:"\"id\":" >nul
-    if !errorlevel! neq 1 (
-        for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
-            set "ASSET_ID=%%B"
-            set "ASSET_ID=!ASSET_ID:,=!"
-            set "ASSET_ID=!ASSET_ID: =!"
+    if !ZIP_FOUND!==1 (
+        echo !LINE! | findstr /C:"\"id\":" >nul
+        if !errorlevel! neq 1 (
+            for /f "tokens=2 delims=:" %%B in ("!LINE!") do (
+                set "ASSET_ID=%%B"
+                set "ASSET_ID=!ASSET_ID:,=!"
+                set "ASSET_ID=!ASSET_ID: =!"
+            )
         )
-        goto :breakloop
     )
-    :continue
 )
 
-:breakloop
+endlocal & set "ASSET_ID=%ASSET_ID%"
+
+
 
 if defined ASSET_ID (
     echo 🗑️ Deleting existing asset ID: !ASSET_ID!...

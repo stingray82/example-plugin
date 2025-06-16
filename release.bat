@@ -126,11 +126,16 @@ REM ─────────────────────────�
 REM ZIP PLUGIN FOLDER
 REM ─────────────────────────────────────────────────────
 SET "SEVENZIP=C:\Program Files\7-Zip\7z.exe"
+set "PARENT_DIR="
+set "FOLDER_NAME="
 for %%a in ("%PLUGIN_DIR%") do (
     set "PARENT_DIR=%%~dpa"
     set "FOLDER_NAME=%%~nxa"
 )
-SET "ZIP_FILE=%PARENT_DIR%%ZIP_NAME%"
+
+REM Access them using delayed expansion
+SET "ZIP_FILE=!PARENT_DIR!!ZIP_NAME!"
+
 
 pushd "%PARENT_DIR%"
 "%SEVENZIP%" a -tzip "%ZIP_FILE%" "%FOLDER_NAME%"

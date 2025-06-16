@@ -285,11 +285,10 @@ curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEAS
     -H "Accept: application/vnd.github+json" ^
     -H "Content-Type: application/zip" ^
     --data-binary "@%ZIP_FILE%"
-
-endlocal
-
 )
 
 echo.
 echo ✅ Deployment complete → %DEPLOY_TARGET%
 pause
+endlocal
+)

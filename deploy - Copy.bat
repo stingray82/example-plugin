@@ -250,31 +250,33 @@ IF /I "%DEPLOY_TARGET%"=="private" (
 
     REM 🗑️ Attempt to find existing ZIP asset and delete it
 set "ASSET_ID="
-for /f "delims=" %%A in ('type "%TEMP%\github_release_response.json" ^| findstr /R /C:"\"name\": \"%ZIP_NAME%\""') do (
-    set "FOUND_ASSET_LINE=%%A"
+for /f "tokens=*" %%A in ('type "%TEMP%\github_release_response.json" ^| findstr /C:"\"name\": \"%ZIP_NAME%\""') do (
+    set "found_name_line=1"
 )
 
-if defined FOUND_ASSET_LINE (
-    for /f "tokens=1,2 delims=:" %%A in ('type "%TEMP%\github_release_response.json" ^| findstr /R /C:"\"id\":"') do (
-        echo %%A | findstr /C:"\"id\"" >nul
+if defined found_name_line (
+    for /f "tokens=*" %%B in ('type "%TEMP%\github_release_response.json" ^| findstr /C:"\"id\":"') do (
+        echo %%B | findstr /R /C:"\"id\": [0-9]*" >nul
         if !errorlevel! == 0 (
-            set "CANDIDATE_ID=%%B"
-            set "CANDIDATE_ID=!CANDIDATE_ID: =!"
-            set "CANDIDATE_ID=!CANDIDATE_ID:,=!"
-            REM Make sure we're only deleting if this is after finding name match
-            if not defined ASSET_ID (
-                set "ASSET_ID=!CANDIDATE_ID!"
+            for /f "tokens=2 delims=:" %%C in ("%%B") do (
+                set "CANDIDATE_ID=%%C"
+                set "CANDIDATE_ID=!CANDIDATE_ID: =!"
+                set "CANDIDATE_ID=!CANDIDATE_ID:,=!"
+                if not defined ASSET_ID (
+                    set "ASSET_ID=!CANDIDATE_ID!"
+                )
             )
         )
     )
 )
 
 if defined ASSET_ID (
-    echo 🗑️ Found existing asset ID: !ASSET_ID! — deleting...
+    echo 🗑️ Deleting existing asset ID: !ASSET_ID!...
     curl -s -X DELETE "https://api.github.com/repos/%GITHUB_REPO%/releases/assets/!ASSET_ID!" ^
         -H "Authorization: token %GITHUB_TOKEN%" ^
         -H "Accept: application/vnd.github+json"
 )
+
 
 
 REM 📤 Upload ZIP file to release

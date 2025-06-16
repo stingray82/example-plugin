@@ -182,15 +182,15 @@ for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
 )
 REM No need to trim, it's a plain string now.
 
-(
-echo {
-echo   "tag_name": "!RELEASE_TAG!",
-echo   "name": "!RELEASE_NAME!",
-echo   "body": "!CHANGELOG_BODY!",
-echo   "draft": false,
-echo   "prerelease": false
-echo }
-) > "!BODY_FILE!"
+REM Write JSON manually to BODY_FILE using echo per line
+> "!BODY_FILE!" echo {
+>> "!BODY_FILE!" echo   "tag_name": "!RELEASE_TAG!",
+>> "!BODY_FILE!" echo   "name": "!RELEASE_NAME!",
+>> "!BODY_FILE!" echo   "body": "!CHANGELOG_BODY!",
+>> "!BODY_FILE!" echo   "draft": false,
+>> "!BODY_FILE!" echo   "prerelease": false
+>> "!BODY_FILE!" echo }
+
 
 
 echo -------- BEGIN JSON BODY --------

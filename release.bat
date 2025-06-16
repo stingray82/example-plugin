@@ -182,15 +182,16 @@ for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
 )
 REM No need to trim, it's a plain string now.
 
-> "!BODY_FILE!" (
-    echo {
-    echo   "tag_name": "!RELEASE_TAG!",
-    echo   "name": "!RELEASE_NAME!",
-    echo   "body": "!CHANGELOG_BODY!",
-    echo   "draft": false,
-    echo   "prerelease": false
-    echo }
-)
+(
+echo {
+echo   "tag_name": "!RELEASE_TAG!",
+echo   "name": "!RELEASE_NAME!",
+echo   "body": "!CHANGELOG_BODY!",
+echo   "draft": false,
+echo   "prerelease": false
+echo }
+) > "!BODY_FILE!"
+
 
 echo -------- BEGIN JSON BODY --------
 type "!BODY_FILE!"

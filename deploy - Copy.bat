@@ -15,7 +15,7 @@ SET "STATIC_FILE=static.txt"
 SET "README=%PLUGIN_DIR%\readme.txt"
 SET "TEMP_README=%PLUGIN_DIR%\readme_temp.txt"
 SET "DEST_DIR=D:\updater.reallyusefulplugins.com\plugin-updates\custom-packages\"
-SET "DEPLOY_TARGET=private"  REM github or private
+SET "DEPLOY_TARGET=github"  REM github or private
 
 REM GitHub settings
 SET "GITHUB_REPO=stingray82/example-plugin"
@@ -118,15 +118,16 @@ SET "ZIP_FILE=%PARENT_DIR%%ZIP_NAME%"
 pushd "%PARENT_DIR%"
 "%SEVENZIP%" a -tzip "%ZIP_FILE%" "%FOLDER_NAME%"
 popd
-echo ✅ Zipped to: %ZIP_FILE%
+echo Zipped to: %ZIP_FILE%
 
 
 
 REM ─────────────────────────────────────────────────────
-REM GENERATE STATIC index.json AND PUSH TO STATIC REPO
+REM GENERATE STATIC index.json AND COMMIT TO STATIC REPO
 REM ─────────────────────────────────────────────────────
-echo 📝 Generating static index.json...
+echo Generating static index.json...
 
+REM Plugin folder within static repo
 SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
 SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%\%PLUGIN_FOLDER_NAME%"
 
@@ -141,7 +142,24 @@ php "%GENERATE_INDEX_SCRIPT%" ^
     "%GITHUB_USER%" ^
     "%STATIC_DOMAIN%"
 
-echo ✅ Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
+echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
+
+REM ─────────────────────────────────────────────────────
+REM GIT COMMIT AND PUSH STATIC REPO
+REM ─────────────────────────────────────────────────────
+pushd "%STATIC_REPO_DIR%"
+git add -A
+
+git diff --cached --quiet
+IF %ERRORLEVEL% EQU 1 (
+    git commit -m "%FOLDER_NAME% version %version%"
+    git push origin main
+    echo  Static repo committed and pushed.
+) ELSE (
+    echo No changes to commit in static repo.
+)
+popd
+
 
 
 

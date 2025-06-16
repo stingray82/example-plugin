@@ -129,7 +129,7 @@ echo Generating static index.json...
 
 REM Plugin folder within static repo
 SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
-SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
+SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR:~0,-1%"
 
 
 IF NOT EXIST "%PLUGIN_STATIC_PATH%" (

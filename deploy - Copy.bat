@@ -249,27 +249,21 @@ IF /I "%DEPLOY_TARGET%"=="private" (
     )
 
     REM 🗑️ Attempt to find existing ZIP asset and delete it
-
-set "ZIP_NAME_LINE="
 set "ASSET_ID="
-setlocal enabledelayedexpansion
-
-REM Find line number where the asset name appears
-for /f "tokens=1 delims=:" %%A in ('findstr /n /C:"\"name\": \"%ZIP_NAME%\"" "%TEMP%\github_release_response.json"') do (
-    set "ZIP_NAME_LINE=%%A"
+for /f "delims=" %%A in ('type "%TEMP%\github_release_response.json" ^| findstr /R /C:"\"name\": \"%ZIP_NAME%\""') do (
+    set "FOUND_ASSET_LINE=%%A"
 )
 
-REM Only continue if ZIP_NAME_LINE was found
-if defined ZIP_NAME_LINE (
-    for /f "tokens=1,* delims=:" %%A in ('findstr /n /C:"\"id\":" "%TEMP%\github_release_response.json"') do (
-        set "LINE_NUM=%%A"
-        set "LINE=%%B"
-        set /a DIFF=LINE_NUM - ZIP_NAME_LINE
-        if !DIFF! GEQ 0 if !DIFF! LEQ 5 (
-            for /f "tokens=2 delims=:" %%x in ("!LINE!") do (
-                set "ASSET_ID=%%x"
-                set "ASSET_ID=!ASSET_ID: =!"
-                set "ASSET_ID=!ASSET_ID:,=!"
+if defined FOUND_ASSET_LINE (
+    for /f "tokens=1,2 delims=:" %%A in ('type "%TEMP%\github_release_response.json" ^| findstr /R /C:"\"id\":"') do (
+        echo %%A | findstr /C:"\"id\"" >nul
+        if !errorlevel! == 0 (
+            set "CANDIDATE_ID=%%B"
+            set "CANDIDATE_ID=!CANDIDATE_ID: =!"
+            set "CANDIDATE_ID=!CANDIDATE_ID:,=!"
+            REM Make sure we're only deleting if this is after finding name match
+            if not defined ASSET_ID (
+                set "ASSET_ID=!CANDIDATE_ID!"
             )
         )
     )
@@ -281,6 +275,7 @@ if defined ASSET_ID (
         -H "Authorization: token %GITHUB_TOKEN%" ^
         -H "Accept: application/vnd.github+json"
 )
+
 
 REM 📤 Upload ZIP file to release
 echo 📤 Uploading new ZIP...

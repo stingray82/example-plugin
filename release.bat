@@ -290,5 +290,4 @@ curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEAS
 echo.
 echo ✅ Deployment complete → %DEPLOY_TARGET%
 pause
-endlocal
 )

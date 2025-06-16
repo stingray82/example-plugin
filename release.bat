@@ -158,8 +158,14 @@ IF /I "%DEPLOY_TARGET%"=="private" (
     CALL :deploy_github
 )
 
-pause
-exit /b
+goto :done
+
+:done
+echo.
+echo 🔚 Done. Press any key to exit...
+pause >nul
+exit
+
 
 :deploy_github
 echo 🚀 Deploying to GitHub...

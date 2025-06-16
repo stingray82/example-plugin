@@ -148,12 +148,14 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
     SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR%"
 
     REM Strip trailing backslash if present
-    IF "%PLUGIN_STATIC_PATH:~-1%"=="\" SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
+    IF NOT "%PLUGIN_STATIC_PATH%"=="" (
+        IF "%PLUGIN_STATIC_PATH:~-1%"=="\" SET "PLUGIN_STATIC_PATH=%PLUGIN_STATIC_PATH:~0,-1%"
+    )
 
-    REM Abort early if result is empty
+    REM Safeguard: silently skip if path still empty
     IF "%PLUGIN_STATIC_PATH%"=="" (
-        echo ❌ PLUGIN_STATIC_PATH resolved to an empty string.
-        pause & exit /b
+        echo ⚠️ PLUGIN_STATIC_PATH is empty. Skipping static generation.
+        goto :skip_static
     )
 
     echo Using PLUGIN_STATIC_PATH: [%PLUGIN_STATIC_PATH%]
@@ -188,6 +190,9 @@ IF /I NOT "%SKIP_STATIC_INDEX%"=="true" (
     )
     popd
 )
+
+:skip_static
+
 
 REM ─────────────────────────────────────────────────────
 REM DEPLOY LOGIC

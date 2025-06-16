@@ -166,12 +166,11 @@ IF /I "%DEPLOY_TARGET%"=="private" (
 goto :done
 
 :done
-if "%INTERACTIVE%"=="1" (
-    echo.
-    echo 🔚 Done. Press any key to exit...
-    pause >nul
-)
+echo.
+echo 🔚 Done. Press any key to exit...
+pause >nul
 exit
+
 
 
 

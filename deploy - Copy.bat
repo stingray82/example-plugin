@@ -248,23 +248,21 @@ IF /I "%DEPLOY_TARGET%"=="private" (
         exit /b
     )
 
-    REM 🗑️ Attempt to find existing ZIP asset and delete it
+    REM 🗑️ Attempt to find existing ZIP asset and delete it properly
 set "ASSET_ID="
-for /f "tokens=*" %%A in ('type "%TEMP%\github_release_response.json" ^| findstr /C:"\"name\": \"%ZIP_NAME%\""') do (
-    set "found_name_line=1"
-)
-
-if defined found_name_line (
-    for /f "tokens=*" %%B in ('type "%TEMP%\github_release_response.json" ^| findstr /C:"\"id\":"') do (
-        echo %%B | findstr /R /C:"\"id\": [0-9]*" >nul
+for /f "tokens=*" %%A in ('type "%TEMP%\github_release_response.json"') do (
+    echo %%A | findstr /C:"\"name\": \"%ZIP_NAME%\"" >nul
+    if !errorlevel! == 0 (
+        set "found_asset=1"
+    )
+    if defined found_asset (
+        echo %%A | findstr /R /C:"\"id\":" >nul
         if !errorlevel! == 0 (
-            for /f "tokens=2 delims=:" %%C in ("%%B") do (
-                set "CANDIDATE_ID=%%C"
-                set "CANDIDATE_ID=!CANDIDATE_ID: =!"
-                set "CANDIDATE_ID=!CANDIDATE_ID:,=!"
-                if not defined ASSET_ID (
-                    set "ASSET_ID=!CANDIDATE_ID!"
-                )
+            for /f "tokens=2 delims=:" %%B in ("%%A") do (
+                set "ASSET_ID=%%B"
+                set "ASSET_ID=!ASSET_ID: =!"
+                set "ASSET_ID=!ASSET_ID:,=!"
+                set "found_asset="
             )
         )
     )
@@ -275,7 +273,10 @@ if defined ASSET_ID (
     curl -s -X DELETE "https://api.github.com/repos/%GITHUB_REPO%/releases/assets/!ASSET_ID!" ^
         -H "Authorization: token %GITHUB_TOKEN%" ^
         -H "Accept: application/vnd.github+json"
+) else (
+    echo ⚠️ No matching asset found to delete.
 )
+
 
 
 

@@ -289,6 +289,7 @@ if defined ASSET_ID (
          https://api.github.com/repos/%GITHUB_REPO%/releases/assets/%ASSET_ID%
 ) else (
     echo ⚠️ No matching asset found to delete.
+)
 
 echo 📤 Uploading new ZIP...
 curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^

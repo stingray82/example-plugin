@@ -291,4 +291,4 @@ curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEAS
 
 echo ✅ Deployment complete → github
 endlocal
-exit /b
+goto :eof

@@ -39,7 +39,7 @@ add_action( 'plugins_loaded', function() {
         'version'     => EXAMPLE_PLUGIN_VERSION, // same as the VERSION constant above
         'key'         => 'testkey123',                 // your secret key for private updater
         //'server'      => 'https://github.com/stingray82/example-plugin',
-        'server'      => 'https://updater.reallyusefulplugins.com/u/',
+        'server'      => 'https://updates.rupwp.uk/example-plugin/index.json',
         // 'textdomain' is omitted, so the helper will automatically use 'slug'
         //'textdomain'  => 'simply-static-export-notify',           // used to translate “Check for updates”
     ];

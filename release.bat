@@ -15,14 +15,13 @@ SET "STATIC_FILE=static.txt"
 SET "README=%PLUGIN_DIR%\readme.txt"
 SET "TEMP_README=%PLUGIN_DIR%\readme_temp.txt"
 SET "DEST_DIR=D:\updater.reallyusefulplugins.com\plugin-updates\custom-packages\"
-SET "DEPLOY_TARGET=github"  REM github or private
+SET "DEPLOY_TARGET=github"
 
 REM GitHub settings
 SET "GITHUB_REPO=stingray82/example-plugin"
 SET "TOKEN_FILE=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\github_token.txt"
 SET /P GITHUB_TOKEN=<"%TOKEN_FILE%"
 SET "ZIP_NAME=example-plugin.zip"
-
 
 REM ─────────────────────────────────────────────────────
 REM STATIC JSON UPDATE CONFIG
@@ -31,9 +30,6 @@ SET "STATIC_REPO_DIR=C:\Users\Nathan\Git\example-static-update\example-plugin\"
 SET "GENERATE_INDEX_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\generate_index.php"
 SET "STATIC_DOMAIN=https://updates.rupwp.uk"
 SET "GITHUB_USER=stingray82"
-
-
-
 
 REM ─────────────────────────────────────────────────────
 REM VERIFY REQUIRED FILES
@@ -103,15 +99,13 @@ IF %ERRORLEVEL% EQU 1 (
 )
 popd
 
-
-
 REM ─────────────────────────────────────────────────────
 REM ZIP PLUGIN FOLDER
 REM ─────────────────────────────────────────────────────
 SET "SEVENZIP=C:\Program Files\7-Zip\7z.exe"
 for %%a in ("%PLUGIN_DIR%") do (
-  set "PARENT_DIR=%%~dpa"
-  set "FOLDER_NAME=%%~nxa"
+    set "PARENT_DIR=%%~dpa"
+    set "FOLDER_NAME=%%~nxa"
 )
 SET "ZIP_FILE=%PARENT_DIR%%ZIP_NAME%"
 
@@ -120,17 +114,13 @@ pushd "%PARENT_DIR%"
 popd
 echo Zipped to: %ZIP_FILE%
 
-
-
 REM ─────────────────────────────────────────────────────
 REM GENERATE STATIC index.json AND COMMIT TO STATIC REPO
 REM ─────────────────────────────────────────────────────
 echo Generating static index.json...
 
-REM Plugin folder within static repo
 SET "PLUGIN_FOLDER_NAME=%FOLDER_NAME%"
 SET "PLUGIN_STATIC_PATH=%STATIC_REPO_DIR:~0,-1%"
-
 
 IF NOT EXIST "%PLUGIN_STATIC_PATH%" (
     mkdir "%PLUGIN_STATIC_PATH%"
@@ -145,24 +135,17 @@ php "%GENERATE_INDEX_SCRIPT%" ^
 
 echo Static JSON generated in: %PLUGIN_STATIC_PATH%\index.json
 
-REM ─────────────────────────────────────────────────────
-REM GIT COMMIT AND PUSH STATIC REPO
-REM ─────────────────────────────────────────────────────
 pushd "%STATIC_REPO_DIR%"
 git add -A
-
 git diff --cached --quiet
 IF %ERRORLEVEL% EQU 1 (
     git commit -m "%FOLDER_NAME% version %version%"
     git push origin main
-    echo  Static repo committed and pushed.
+    echo Static repo committed and pushed.
 ) ELSE (
     echo No changes to commit in static repo.
 )
 popd
-
-
-
 
 REM ─────────────────────────────────────────────────────
 REM DEPLOY LOGIC
@@ -191,34 +174,32 @@ echo Creating body file...
 
 for /f "usebackq delims=" %%l in ("%CHANGELOG_FILE%") do (
     set "line=%%l"
-    set "line=!line:"=\\\"!"
+    set "line=!line:\=\\!"
+    set "line=!line:"=\\"!"
     set "CHANGELOG_BODY=!CHANGELOG_BODY!!line!\n"
 )
 set "CHANGELOG_BODY=!CHANGELOG_BODY:~0,-2!"
 
 > "!BODY_FILE!" (
-    echo { 
-    echo "tag_name": "!RELEASE_TAG!",
-    echo "name": "!RELEASE_NAME!",
-    echo "body": "!CHANGELOG_BODY!",
-    echo "draft": false,
-    echo "prerelease": false
+    echo {
+    echo   "tag_name": "!RELEASE_TAG!",
+    echo   "name": "!RELEASE_NAME!",
+    echo   "body": "!CHANGELOG_BODY!",
+    echo   "draft": false,
+    echo   "prerelease": false
     echo }
 )
-
 
 echo -------- BEGIN JSON BODY --------
 type "!BODY_FILE!"
 echo -------- END JSON BODY ----------
 
-REM Try to get existing release by tag
 curl -s -w "%%{http_code}" -o "%TEMP%\github_release_response.json" ^
     -H "Authorization: token %GITHUB_TOKEN%" ^
     -H "Accept: application/vnd.github+json" ^
     https://api.github.com/repos/%GITHUB_REPO%/releases/tags/!RELEASE_TAG! > "%TEMP%\github_http_status.txt"
 
 set /p HTTP_STATUS=<"%TEMP%\github_http_status.txt"
-
 set "RELEASE_ID="
 
 if "!HTTP_STATUS!"=="200" (
@@ -257,7 +238,6 @@ IF NOT DEFINED RELEASE_ID (
     exit /b
 )
 
-REM 🗑️ Attempt to find existing ZIP asset and delete it properly
 set "ASSET_ID="
 set "FOUND_ZIP=0"
 
@@ -269,7 +249,6 @@ for /f "tokens=*" %%L in ('type "%TEMP%\github_release_response.json"') do (
     )
 
     if !FOUND_ZIP! == 1 (
-        rem Skip until ZIP asset found
         goto :continue
     )
 
@@ -296,7 +275,6 @@ if defined ASSET_ID (
     echo ⚠️ No matching asset found to delete.
 )
 
-REM 📤 Upload ZIP file to release
 echo 📤 Uploading new ZIP...
 curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
     -H "Authorization: token %GITHUB_TOKEN%" ^

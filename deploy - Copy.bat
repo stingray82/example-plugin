@@ -248,15 +248,50 @@ IF /I "%DEPLOY_TARGET%"=="private" (
         exit /b
     )
 
-    echo ✅ Using Release ID: !RELEASE_ID!
+    REM 🗑️ Attempt to find existing ZIP asset and delete it
 
-    curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
+set "ZIP_NAME_LINE="
+set "ASSET_ID="
+setlocal enabledelayedexpansion
+
+REM Find line number where the asset name appears
+for /f "tokens=1 delims=:" %%A in ('findstr /n /C:"\"name\": \"%ZIP_NAME%\"" "%TEMP%\github_release_response.json"') do (
+    set "ZIP_NAME_LINE=%%A"
+)
+
+REM Only continue if ZIP_NAME_LINE was found
+if defined ZIP_NAME_LINE (
+    for /f "tokens=1,* delims=:" %%A in ('findstr /n /C:"\"id\":" "%TEMP%\github_release_response.json"') do (
+        set "LINE_NUM=%%A"
+        set "LINE=%%B"
+        set /a DIFF=LINE_NUM - ZIP_NAME_LINE
+        if !DIFF! GEQ 0 if !DIFF! LEQ 5 (
+            for /f "tokens=2 delims=:" %%x in ("!LINE!") do (
+                set "ASSET_ID=%%x"
+                set "ASSET_ID=!ASSET_ID: =!"
+                set "ASSET_ID=!ASSET_ID:,=!"
+            )
+        )
+    )
+)
+
+if defined ASSET_ID (
+    echo 🗑️ Found existing asset ID: !ASSET_ID! — deleting...
+    curl -s -X DELETE "https://api.github.com/repos/%GITHUB_REPO%/releases/assets/!ASSET_ID!" ^
         -H "Authorization: token %GITHUB_TOKEN%" ^
-        -H "Accept: application/vnd.github+json" ^
-        -H "Content-Type: application/zip" ^
-        --data-binary "@%ZIP_FILE%"
+        -H "Accept: application/vnd.github+json"
+)
 
-    endlocal
+REM 📤 Upload ZIP file to release
+echo 📤 Uploading new ZIP...
+curl -s -X POST "https://uploads.github.com/repos/%GITHUB_REPO%/releases/!RELEASE_ID!/assets?name=%ZIP_NAME%" ^
+    -H "Authorization: token %GITHUB_TOKEN%" ^
+    -H "Accept: application/vnd.github+json" ^
+    -H "Content-Type: application/zip" ^
+    --data-binary "@%ZIP_FILE%"
+
+endlocal
+
 )
 
 echo.

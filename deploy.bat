@@ -25,7 +25,8 @@ SET "ZIP_NAME=example-plugin.zip"
 
 REM JSON Settings
 SET "GENERATOR_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\generate_index.php"
-SET "STATIC_SUBFOLDER=%PLUGIN_DIR%\uupd"
+SET "REPO_ROOT=%PLUGIN_DIR%\.."
+SET "STATIC_SUBFOLDER=%REPO_ROOT:\=\\%\uupd"
 
 REM Script Version 1.1
 

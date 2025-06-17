@@ -1,0 +1,21 @@
+{
+    "slug": "example-plugin",
+    "version": "1.0.6.5",
+    "tested": "6.8.1",
+    "min_wp_version": "6.5",
+    "min_php_version": "8.0",
+    "homepage": "https://raw.githubusercontent.com/stingray82/example-plugin/main/uupd/",
+    "download_url": "https://github.com/stingray82/example-plugin/releases/latest/download/example-plugin.zip",
+    "icons": {
+        "1x": "https://raw.githubusercontent.com/stingray82/example-plugin/main/uupd/icon-128.png",
+        "2x": "https://raw.githubusercontent.com/stingray82/example-plugin/main/uupd/icon-256.png"
+    },
+    "banners": {
+        "low": "https://raw.githubusercontent.com/stingray82/example-plugin/main/uupd/banner-772x250.png",
+        "high": "https://raw.githubusercontent.com/stingray82/example-plugin/main/uupd/banner-1544x500.png"
+    },
+    "sections": {
+        "changelog": "<h4>1.15 (March 2025)</h4><ul><li>Fixed: Readme Issues</li><li>Tweaked: Updater</li></ul><h4>1.14</h4><ul><li>Tweaked: Readme File</li><li>New: Screenshot and Video Links</li></ul><h4>1.13</h4><ul><li>New: Requires requirement for SureForms</li></ul><h4>1.12</h4><ul><li>Fixed: Handle SureForms not being installed before installing HookSure gracefully</li><li>New: `wp-safe_redirect` on deletion to prevent loop of deletion of newly added hook to the same ID that was just deleted</li></ul><h4>1.11</h4><ul><li>Fixed: Plugin Description issue</li></ul><h4>1.1</h4><ul><li>New: dynamic form fetching to replace manual form ID entry</li><li>Improvement: admin interface for better usability</li><li>Improvement: compatibility with WordPress 6.4</li></ul><h4>1.0</h4><ul><li>New:  Initial release</li></ul>"
+    },
+    "last_updated": "2025-06-17 16:47:47"
+}

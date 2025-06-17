@@ -23,6 +23,12 @@ SET "TOKEN_FILE=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\github_
 SET /P GITHUB_TOKEN=<"%TOKEN_FILE%"
 SET "ZIP_NAME=example-plugin.zip"
 
+REM JSON Settings
+SET "GENERATOR_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\generate_index.php"
+SET "STATIC_SUBFOLDER=%PLUGIN_DIR%\uupd"
+
+REM Script Version 1.1
+
 REM ─────────────────────────────────────────────────────
 REM VERIFY REQUIRED FILES
 REM ─────────────────────────────────────────────────────
@@ -49,6 +55,41 @@ for /f "tokens=2* delims=:" %%A in ('findstr /C:"Requires at least:" "%PLUGIN_FI
 for /f "tokens=2* delims=:" %%A in ('findstr /C:"Tested up to:" "%PLUGIN_FILE%"') do for /f "tokens=* delims= " %%X in ("%%A") do set "tested_up_to=%%X"
 for /f "tokens=2* delims=:" %%A in ('findstr /C:"Version:" "%PLUGIN_FILE%"') do for /f "tokens=* delims= " %%X in ("%%A") do set "version=%%X"
 for /f "tokens=2* delims=:" %%A in ('findstr /C:"Requires PHP:" "%PLUGIN_FILE%"') do for /f "tokens=* delims= " %%X in ("%%A") do set "requires_php=%%X"
+
+REM ─────────────────────────────────────────────────────
+REM GENERATE STATIC index.json FILE FOR GITHUB DELIVERY
+REM ─────────────────────────────────────────────────────
+echo 🧾 Generating index.json for GitHub-based delivery...
+
+REM Extract GitHub username and repo from GITHUB_REPO
+FOR /F "tokens=1,2 delims=/" %%A IN ("%GITHUB_REPO%") DO (
+    SET "GITHUB_USER=%%A"
+    SET "REPO_NAME=%%B"
+)
+
+REM Construct raw CDN path for JSON delivery
+SET "CDN_PATH=https://raw.githubusercontent.com/%GITHUB_USER%/%REPO_NAME%/main/uupd"
+
+REM Ensure uupd directory exists
+IF NOT EXIST "%STATIC_SUBFOLDER%" (
+    mkdir "%STATIC_SUBFOLDER%"
+)
+
+php "%GENERATOR_SCRIPT%" ^
+    "%PLUGIN_FILE%" ^
+    "%CHANGELOG_FILE%" ^
+    "%STATIC_SUBFOLDER%" ^
+    "%GITHUB_USER%" ^
+    "%CDN_PATH%" ^
+    "%REPO_NAME%" ^
+    "%REPO_NAME%"
+
+IF EXIST "%STATIC_SUBFOLDER%\index.json" (
+    echo ✅ index.json generated → %STATIC_SUBFOLDER%\index.json
+) ELSE (
+    echo ❌ Failed to generate index.json
+)
+
 
 REM ─────────────────────────────────────────────────────
 REM CREATE README.TXT
@@ -90,8 +131,6 @@ IF %ERRORLEVEL% EQU 1 (
     echo ⚠️ No changes to commit.
 )
 popd
-
-
 
 REM ─────────────────────────────────────────────────────
 REM ZIP PLUGIN FOLDER

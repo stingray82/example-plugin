@@ -5,7 +5,7 @@
  * Tested up to:      6.8.1
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.0.6.6
+ * Version:           1.0.6.7
  * Author:            Nathan Foley
  * Author URI:        https://reallyusefulplugins.com
  * License:           GPL2
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define our plugin version
 if ( ! defined( 'EXAMPLE_PLUGIN_VERSION' ) ) {
-    define('EXAMPLE_PLUGIN_VERSION', '1.0.6.6');
+    define('EXAMPLE_PLUGIN_VERSION', '1.0.6.7');
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ add_action( 'plugins_loaded', function() {
         'name'        => 'example-plugin',         // human‐readable plugin name
         'version'     => EXAMPLE_PLUGIN_VERSION, // same as the VERSION constant above
         'key'         => 'testkey123',                 // your secret key for private updater
-        'server'      => 'https://github.com/stingray82/example-plugin',
+        'server'      => 'https://raw.githubusercontent.com/stingray82/example-plugin/main/uupd/index.json',
         //'server'      => 'https://updater.reallyusefulplugins.com/u/',
         // 'textdomain' is omitted, so the helper will automatically use 'slug'
         

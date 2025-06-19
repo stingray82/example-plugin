@@ -28,6 +28,8 @@ SET "GENERATOR_SCRIPT=C:\Ignore By Avast\0. PATHED Items\Plugins\deployscripts\g
 SET "REPO_ROOT=%PLUGIN_DIR%\.."
 SET "STATIC_SUBFOLDER=%REPO_ROOT:\=\\%\uupd"
 
+
+
 REM Script Version 1.1
 
 REM ─────────────────────────────────────────────────────
@@ -83,6 +85,8 @@ php "%GENERATOR_SCRIPT%" ^
     "%GITHUB_USER%" ^
     "%CDN_PATH%" ^
     "%REPO_NAME%" ^
+    "%REPO_NAME%" ^
+    "%STATIC_FILE%" ^
     "%ZIP_NAME%"
 
 IF EXIST "%STATIC_SUBFOLDER%\index.json" (

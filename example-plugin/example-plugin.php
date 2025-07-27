@@ -5,7 +5,7 @@
  * Tested up to:      6.8.2
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.0.6.15
+ * Version:           1.0.6.20
  * Author:            Nathan Foley
  * Author URI:        https://reallyusefulplugins.com
  * License:           GPL2
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define our plugin version
 if ( ! defined( 'EXAMPLE_PLUGIN_VERSION' ) ) {
-    define('EXAMPLE_PLUGIN_VERSION', '1.0.6.15');
+    define('EXAMPLE_PLUGIN_VERSION', '1.0.6.20');
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ add_action( 'plugins_loaded', function() {
 
     // 3) Call the helper in the UUPD\V1 namespace:
     \UUPD\V1\UUPD_Updater_V1::register( $updater_config );
-}, 1 );
+}, 20 );
 
 
 ?>

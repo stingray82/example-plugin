@@ -4,7 +4,7 @@ Donate link: https://reallyusefulplugins.com/donate
 Tags: Example 
 Requires at least: 6.5
 Tested up to: 6.8.2
-Stable tag: 1.0.6.22-dev
+Stable tag: 1.0.6.22-dev.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

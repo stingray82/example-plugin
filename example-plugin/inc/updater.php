@@ -135,22 +135,6 @@
  *
  */
 
-// Polyfill for PHP < 8.0
-if ( ! function_exists( 'str_ends_with' ) ) {
-    function str_ends_with( $haystack, $needle ) {
-        $haystack = (string) $haystack;
-        $needle   = (string) $needle;
-        if ( $needle === '' ) {
-            return true;
-        }
-        if ( strlen( $needle ) > strlen( $haystack ) ) {
-            return false;
-        }
-        return substr( $haystack, -strlen( $needle ) ) === $needle;
-    }
-}
-
-
 namespace UUPD\V1;
 
 if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
@@ -241,7 +225,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
             $host_qs    = rawurlencode( wp_parse_url( untrailingslashit( home_url() ), PHP_URL_HOST ) );
 
             $separator  = strpos( $c['server'], '?' ) === false ? '?' : '&';
-            $url = ( \str_ends_with( $c['server'], '.json' ) ? $c['server'] : untrailingslashit( $c['server'] ) )
+            $url = ( self::ends_with( $c['server'], '.json' ) ? $c['server'] : untrailingslashit( $c['server'] ) )
                  . $separator . "action=get_metadata&slug={$slug_qs}&key={$key_qs}&domain={$host_qs}";
 
 
@@ -418,7 +402,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
 
                         // Prefer an uploaded .zip asset if one exists
                         foreach ( $release->assets ?? [] as $asset ) {
-                            if ( isset( $asset->name, $asset->browser_download_url ) && \str_ends_with( $asset->name, '.zip' ) ) {
+                            if ( isset( $asset->name, $asset->browser_download_url ) && self::ends_with( $asset->name, '.zip' ) ) {
                                 $zip_url = $asset->browser_download_url;
                                 break;
                             }
@@ -576,7 +560,7 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
 
                     // Prefer an uploaded .zip asset if one exists
                     foreach ( $release->assets ?? [] as $asset ) {
-                        if ( isset( $asset->name, $asset->browser_download_url ) && \str_ends_with( $asset->name, '.zip' ) ) {
+                        if ( isset( $asset->name, $asset->browser_download_url ) && self::ends_with( $asset->name, '.zip' ) ) {
                             $zip_url = $asset->browser_download_url;
                             break;
                         }
@@ -750,6 +734,21 @@ if ( ! class_exists( __NAMESPACE__ . '\UUPD_Updater_V1' ) ) {
                 do_action( 'uupd/log', $msg, $this->config['slug'] ?? '' );
             }
         }
+
+
+        private static function ends_with( $haystack, $needle ) {
+            if ( function_exists( 'str_ends_with' ) ) {
+                return \str_ends_with( (string) $haystack, (string) $needle );
+            }
+            $haystack = (string) $haystack;
+            $needle   = (string) $needle;
+            if ( $needle === '' ) return true;
+            if ( strlen( $needle ) > strlen( $haystack ) ) return false;
+            return substr( $haystack, -strlen( $needle ) ) === $needle;
+        }
+
+
+
 
         /**
          * NEW STATIC HELPER: register everything (was the global function before).

@@ -5,7 +5,7 @@
  * Tested up to:      6.8.2
  * Requires at least: 6.5
  * Requires PHP:      8.0
- * Version:           1.62.26-beta.2
+ * Version:           1.62.26-rc
  * Author:            Nathan Foley
  * Author URI:        https://reallyusefulplugins.com
  * License:           GPL2
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define our plugin version
 if ( ! defined( 'EXAMPLE_PLUGIN_VERSION' ) ) {
-    define('EXAMPLE_PLUGIN_VERSION', '1.62.26-beta.2');
+    define('EXAMPLE_PLUGIN_VERSION', '1.62.26-rc');
 }
 
 // ──────────────────────────────────────────────────────────────────────────

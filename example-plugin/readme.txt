@@ -1,13 +1,13 @@
 === Example Plugin ===
 Contributors: reallyusefulplugins
 Donate link: https://reallyusefulplugins.com/donate
-Tags: Example 
+Tags: Example, plugin
 Requires at least: 6.5
-Tested up to: 6.8.2
-Stable tag: 1.0.0
+Tested up to: 6.9.4
+Stable tag: 1.0.1-alpha
 Requires PHP: 8.0
-License: GPL-2.0-or-later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: GPL-3.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 This is just an example plugin to test updates
 
@@ -24,29 +24,86 @@ This is just an example plugin to test updates
 == Frequently Asked Questions ==
 
 = How do I modify the settings =
-There ae no settings on this plugin 
-== Changelog == 
-= 1.15 (March 2025) =
-Fixed: Readme Issues  
-Tweaked: Updater
-= 1.14 =
-Tweaked: Readme File  
-New: Screenshot and Video Links  
+There ae no settings on this plugin
+== Changelog ==
+= 2.0.0 15 April 2026 =
+Breaking: Tag mappings must be recreated after updating from any 1.x version
+Breaking: Manual Price ID entry replaced with SureCart product and price dropdown selectors
+Warning: Please review and remap your tags after updating to ensure correct behaviour
+New: SureCart product lookup added to admin page
+New: SureCart price/version dropdown selector added
+New: “All prices for this product” mapping option
+New: Product-level mapping support (single rule for all prices)
+New: Mapping filters (search, status, and type)
+New: Add Mapping button added to both top and bottom of mappings screen
+Improvement: Modernised admin UI with card-based layout
+Improvement: Enhanced mapping UX with dynamic product/price selection
+Improvement: Improved purchase matching logic for product-wide and price-specific rules
+Removed: Friendly Name field (no longer required with product/price display)
+Compatibility: Continued support for FluentCRM tag assignment
+Compatibility: Maintained compatibility with SureCart checkout hooks
+Compatibility: Updater and MainWP integration retained
 
-= 1.13 =
-New: Requires requirement for SureForms  
+1.0.17 06 April 2026 =
+Fixed: Admin Menu
 
-= 1.12 =
-Fixed: Handle SureForms not being installed before installing HookSure gracefully  
-New: `wp-safe_redirect` on deletion to prevent loop of deletion of newly added hook to the same ID that was just deleted  
+= 1.0.16 23 March 2026 =
+Update: Updater to 2.0-Alpha
+Update: Compatibility
 
-= 1.11 =
-Fixed: Plugin Description issue  
+= 1.0.15 12 August 2025 =
+New: Deploy Methodology 
+New: Production Test - New deploy.sh 
+Fixed: Icon Issue
 
-= 1.1 =
-New: dynamic form fetching to replace manual form ID entry  
-Improvement: admin interface for better usability  
-Improvement: compatibility with WordPress 6.4  
 
-= 1.0 =
-New:  Initial release  
+= 1.0.14 7 August 2025 =
+New: Deploy Methodology 
+
+= 1.0.13 5 August 2025 =
+Fixed: Comment out WP Icon Filter which is causing issues in latest MainWP
+
+= 1.0.12 2 Aug 2025 =
+New: MainWP Icon Filter
+
+= 1.0.11 27 July 2025 =
+New: Prepare Future Support for Preleases
+New: Updated UUPD to 1.3.0
+
+
+= 1.0.10 14 July 2025 =
+Update: UUPD 1.2.5
+
+= 1.0.9 06 July 2025 =
+New: Rescoped RUP_UUPD
+Update: UUPD 1.2.4
+
+= 1.0.8 21 June 2025 =
+New: Updates Now served directly from GitHub using UUPD
+
+= 1.0.7 (27 May 2025) =
+Improve: Updater Class robustness in WP 6.8
+
+= 1.0.6 (26 May 2025) =
+New: Admin Overhaul Part 1
+New: Multi-Tag Support
+New: SurelyWP Hook Added
+
+
+= 1.0.5 (25 May 2025) =
+New: Delete Parings
+
+= 1.0.4 (23 May 2025) =
+Tweak: First Automatic Updater Test
+
+= 1.0.3 (23 May 2025) =
+New: Added Automatic Updater
+
+= 1.0.2 (22 May 2025) =
+New: Allow each mapping to be disabled i.e. for offer periods.
+
+= 1.0.1 (20 May 2025) =
+New: Added Dynamic Loading of Tags
+
+= 1.0 (19 May 2025) =
+New: Initial Release
